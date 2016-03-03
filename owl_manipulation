@@ -35,22 +35,28 @@ def conv(pic):
     i = 0
     going_down = False
     while 1:
-        #colours = int(math.ceil(math.pow(1.3,i)))
+
         color_float = math.pow(1.1,i*2)
         colours = int(color_float)
-        print "colour depth: i=" +str(i)+"->colours="+str(colours)+" color_float=" + str(color_float)
+
+        # print "colour depth: i=" +str(i)+"->colours="+str(colours)+" color_float=" + str(color_float)
         going_down, colours = is_going_down(going_down, colours)
 
         set_picture_colours(pic, pic_name, colours)
 
-        if not (going_down):
-            i += 1
-            if(colours>20):
-                i *= MULTIPLIER
-        else:
-            i -= 1
-            if(colours>20):
-                i /= MULTIPLIER
+        i = LFO(i, going_down, colours)
+
+
+def LFO(i, going_down, colours):
+    if not (going_down):
+        i += 1
+        if (colours > 20):
+            i *= MULTIPLIER
+    else:
+        i -= 1
+        if (colours > 20):
+            i /= MULTIPLIER
+    return i
 
 
 def set_picture_colours(pic, pic_name, colours):
@@ -62,16 +68,16 @@ def set_picture_colours(pic, pic_name, colours):
     img.convert('RGB').save(pic_name)
 
 
-def is_going_down(max, colours):
+def is_going_down(down, colours):
     if (colours > 255):
-        max = True
+        down = True
         colours = 255
     elif (colours < 2):
-        max = False
+        down = False
         colours = 1
         # if (last_colours != colours):
         #   print "-<>-<>rendered!<>-<>-"
-    return max, colours
+    return down, colours
 
 
 def get_new_name_for(pic):
@@ -93,6 +99,7 @@ OWL_PIC_2 = "owl2_3.jpg"
 
 # rotate()
 # blur_image(OWL_PIC)
-conv(OWL_PIC)
+#conv(OWL_PIC)
+bitcrush_picture(OWL_PIC)
 
 # fade(OWL_PIC,OWL_PIC_2)

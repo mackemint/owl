@@ -1,0 +1,74 @@
+import math
+
+class Manipulator(object):
+    '''
+    Manipulator provides a base class for all types of manipulation of an image
+    It contains a counter and a mod value
+    The counter is meant to keep track of all iteration and can get a span determined by the _min and _max values
+    The mod value is supposed to be used to manipulate the value of an image somehow
+    '''
+    def __init__(self, lo, hi, cnt, mod):    # Constructor of the class
+        '''
+
+        :param lo:
+        :param hi:
+        :param cnt:
+        :param mod:
+        :return:
+        '''
+        self._cnt_val = cnt
+        self._mod_val = mod
+        self._min = lo
+        self._max = hi
+
+    def count(self, val):
+        '''
+
+        :param val: the value (positive or negative) that will affect the counter value
+        ensures the counting will stay within specified max and min values
+
+        Default behaviour is a falling or rising ramp function
+        :return: counter value
+        '''
+
+        self._cnt_val += val
+
+        if self.modulate(self._cnt_val) > self._max:
+            self._cnt_val = self._min
+
+        elif self.modulate(self._cnt_val) < self._min:
+            self._cnt_val = self._max
+
+        return self._cnt_val
+
+    def modulate(self, cnt):
+        '''
+        :param cnt: counter value
+        :return: modulation value as function of counter value
+        '''
+        return self._mod_val
+
+
+class BitCrusher(Manipulator):
+    def __init__(self, lo, hi, cnt, mod):
+        '''
+        defaults to an 8-bit color resolution
+        :param lo:
+        :param hi:
+        :param cnt: offset count
+        :param mod: offset colour
+        :return:
+        '''
+        Manipulator.__init__(self, lo=2, hi=255)
+
+    def modulate(self, cnt):
+        number_of_colours = int(math.pow(1.1, cnt*2))
+
+        return number_of_colours
+
+
+
+
+
+
+
