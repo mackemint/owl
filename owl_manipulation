@@ -4,6 +4,7 @@ from PIL import ImageFilter
 import time
 import math
 
+MULTIPLIER = 1.2
 
 def rotate():
 
@@ -28,35 +29,50 @@ def blur_image(pic):
 
 
 def conv(pic):
+
     last_colours = 0
     pic_name = get_new_name_for(pic)
     i = 0
-    max = False
+    going_down = False
     while 1:
         #colours = int(math.ceil(math.pow(1.3,i)))
-        color_float = math.pow(1.5,i)
+        color_float = math.pow(1.1,i*2)
         colours = int(color_float)
         print "colour depth: i=" +str(i)+"->colours="+str(colours)+" color_float=" + str(color_float)
-        if (colours>255):
-            max=True
-            colours = 255
-        elif (colours<1):
-            max = False
-            colours = 1
-        if (last_colours != colours):
-            print "-<>-<>rendered!<>-<>-"
-            img = Image.open(pic)
-            img = img.convert(mode='P',
-                              colors=colours,
-                              dither=None,
-                              palette=Image.ADAPTIVE)
+        going_down, colours = is_going_down(going_down, colours)
 
-            last_colours = colours
-            img.convert('RGB').save(pic_name)
-        if not (max):
+        set_picture_colours(pic, pic_name, colours)
+
+        if not (going_down):
             i += 1
+            if(colours>20):
+                i *= MULTIPLIER
         else:
             i -= 1
+            if(colours>20):
+                i /= MULTIPLIER
+
+
+def set_picture_colours(pic, pic_name, colours):
+    img = Image.open(pic)
+    img = img.convert(mode='P',
+                      colors=colours,
+                      dither=None,
+                      palette=Image.ADAPTIVE)
+    img.convert('RGB').save(pic_name)
+
+
+def is_going_down(max, colours):
+    if (colours > 255):
+        max = True
+        colours = 255
+    elif (colours < 2):
+        max = False
+        colours = 1
+        # if (last_colours != colours):
+        #   print "-<>-<>rendered!<>-<>-"
+    return max, colours
+
 
 def get_new_name_for(pic):
     pic_name = pic.replace(".jpg", "") + "_3" + ".jpg"
